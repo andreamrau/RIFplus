@@ -98,15 +98,3 @@ RIFplus <- function(exprs, TFnames, conds) {
 #' @format Blah blah
 #' @return Blah blah
 NULL
-
-#' Example TFs
-#'
-#' Blah blah blah
-#'
-#' @name RIF_genenames
-#' @docType data
-#' @usage data(RIF_genenames)
-#' @keywords datasets
-#' @format Blah blah
-#' @return Blah blah
-NULL
