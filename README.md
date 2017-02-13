@@ -13,8 +13,7 @@ library(RIFplus)
 data(RIF_data)
 exprs <- RIF_data
 conds <- factor(c(rep("nain", 24), rep("wt", 24)))
-data(RIF_genenames)
-rownames(exprs) <- RIF_genenames$V2
+rownames(exprs) <- RIF_data_genes$TF_Symbol
 TFnames <- rownames(exprs)[1:754]
 rif_calc <- RIFplus(exprs=exprs, TFnames=TFnames, conds=conds)
 rif <- cbind(rif_calc$rif1, rif_calc$rif2)

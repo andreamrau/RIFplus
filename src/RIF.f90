@@ -23,7 +23,8 @@
 
 SUBROUTINE rif(ntf, nta, nconditions1, nconditions2, &
 	TFdata1, targetdata1, TFdata2, targetdata2, rif1, rif2, &
-	cond1Xntf, cond2Xntf, cond1Xnta, cond2Xnta)
+	cond1Xntf, cond2Xntf, cond1Xnta, cond2Xnta, &
+	rif1_pergene, rif2_pergene)
 
 	IMPLICIT NONE
 	! Type declarations
@@ -34,7 +35,7 @@ SUBROUTINE rif(ntf, nta, nconditions1, nconditions2, &
 	INTEGER :: cond2Xnta
 	
 	DOUBLE PRECISION :: TFdata1(cond1Xntf), TFdata2(cond2Xntf), targetdata1(cond1Xnta), targetdata2(cond2Xnta)
-	DOUBLE PRECISION :: rif1(ntf), rif2(ntf)
+	DOUBLE PRECISION :: rif1(ntf), rif2(ntf), rif1_pergene(ntf*nta), rif2_pergene(ntf*nta)
 	DOUBLE PRECISION :: tfcexpr(ntf, nconditions1), tfnexpr(ntf, nconditions2), tacexpr(nta, nconditions1), tanexpr(nta, nconditions2)
 	DOUBLE PRECISION :: gene_ccorr(ntf, nta), gene_ncorr(ntf, nta)
 	DOUBLE PRECISION :: tf_tmp1(nconditions1), ta_tmp1(nconditions1), tf_tmp2(nconditions2), ta_tmp2(nconditions2)
@@ -83,7 +84,7 @@ SUBROUTINE rif(ntf, nta, nconditions1, nconditions2, &
 	!###################################################
 	! Double loop and printing output
 	!###################################################
-		
+	ind = 1	
 	DO i = 1, ntf
 		rif1(i) = 0.
 		rif2(i) = 0.
@@ -97,11 +98,14 @@ SUBROUTINE rif(ntf, nta, nconditions1, nconditions2, &
 			ave = (SUM(ta_tmp1)/nconditions1 + SUM(ta_tmp2)/nconditions2)/2.
 			de = SUM(ta_tmp1)/nconditions1 - SUM(ta_tmp2)/nconditions2
 			dw = gene_ccorr(i,j) - gene_ncorr(i,j)
+			rif1_pergene(ind) = ave * de * (dw**2)
 			rif1(i) = rif1(i) + ave * de * (dw**2)
 			
 			er1= SUM(ta_tmp1)/nconditions1 * gene_ccorr(i,j)
 			er2= SUM(ta_tmp2)/nconditions2 * gene_ncorr(i,j)
+			rif2_pergene(ind) = er1**2 - er2**2 
 			rif2(i) = rif2(i) + er1**2 - er2**2 
+			ind = ind + 1
 		ENDDO
 		rif1(i) = rif1(i) / nta
 		rif2(i) = rif2(i) / nta

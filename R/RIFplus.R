@@ -49,6 +49,9 @@ RIFplus <- function(exprs, TFnames, conds) {
   targetdata_vec1 <- as.numeric(unlist(t(targetdata1)))
   TFdata_vec2 <- as.numeric(unlist(t(TFdata2)))
   targetdata_vec2 <- as.numeric(unlist(t(targetdata2)))
+  rif1_pergene <- as.numeric(rep(0, length=nta*ntf))
+  rif2_pergene <- as.numeric(rep(0, length=nta*ntf))
+
 
   ## Initialize rif1scores and rif2scores
   rif1init <-  rif2init <- runif(ntf)
@@ -66,13 +69,23 @@ RIFplus <- function(exprs, TFnames, conds) {
                   cond2Xntf = as.integer(nconditions2 * ntf),
                   cond1Xnta = as.integer(nconditions1 * nta),
                   cond2Xnta = as.integer(nconditions2 * nta),
+                  rif1_pergene = rif1_pergene,
+                  rif2_pergene = rif2_pergene,
                   PACKAGE = "RIFplus")
   rif1 <- round(out$rif1,5)
   rif2 <- round(out$rif2,5)
+  names(rif1) <- names(rif2) <- TFnames
   rif1 <- (rif1 - mean(rif1)) /
     sqrt( (sum(rif1^2) - sum(rif1)*sum(rif1)/length(rif1)) / (length(rif1)-1) )
   rif2 <- (rif2 - mean(rif2)) /
     sqrt( (sum(rif2^2) - sum(rif2)*sum(rif2)/length(rif2)) / (length(rif2)-1) )
+
+  rif1_pergene <- matrix(as.numeric(out$rif1_pergene), nrow=length(TFnames), byrow=TRUE)
+  rif2_pergene <- matrix(as.numeric(out$rif2_pergene), nrow=length(TFnames), byrow=TRUE)
+  rownames(rif1_pergene) <- rownames(rif2_pergene) <- TFnames
+  colnames(rif1_pergene) <- colnames(rif2_pergene) <-
+    rownames(exprso)[which(!rownames(exprso) %in% TFnames)]
+
   return(list(
               rif1 = round(rif1,6), rif2 = round(rif2,6),
               rif1_top = data.frame(TFnames = TFnames[which(abs(rif1) >= 1.96 )],
@@ -81,7 +94,9 @@ RIFplus <- function(exprs, TFnames, conds) {
               rif2_top = data.frame(TFnames = TFnames[which(abs(rif2) >= 1.96 )],
                                     rif1 = rif1[which(abs(rif2) >= 1.96)],
                                     rif2 = rif2[which(abs(rif2) >= 1.96)]),
-              rif1_nostd=out$rif1, rif2_nostd=out$rif2))
+              rif1_nostd=out$rif1, rif2_nostd=out$rif2,
+              rif1_pergene=rif1_pergene,
+              rif2_pergene=rif2_pergene))
 }
 
 
